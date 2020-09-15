@@ -1,0 +1,13 @@
+{
+    "name": "maksim/slim-blog",
+    "description": "using slim framework",
+    "type": "project",
+    "license": "mit",
+    "authors": [
+        {
+            "name": "Maksim Litvinov",
+            "email": "litvinovmksm@gmail.com"
+        }
+    ],
+    "require": {}
+}
