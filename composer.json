@@ -9,5 +9,9 @@
             "email": "litvinovmksm@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "slim/slim": "^4.5",
+        "slim/psr7": "^1.2",
+        "slim/http": "^1.0"
+    }
 }
