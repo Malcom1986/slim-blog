@@ -3,8 +3,14 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
+use DI\Container;
 
-$app = AppFactory::create();
+$container = new Container();
+$container->set('renderer' ,function () {
+	return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
+});
+
+$app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
 
 $app->get('/', function ($request, $response) {
@@ -15,8 +21,15 @@ $app->get('/', function ($request, $response) {
 
 $app->get('/users/{id}', function ($request, $response, $args) {
 	$id = $args['id'];
-    return $response->write("Users id is {$id}");
+	$name = $request->getQueryParam('name', 'noname');
+	$params = [
+        'id' => $id,
+        'nickname' => "user - {$id}",
+        'name' => $name,
+	];
+	return $this->get('renderer')->render($response, 'users/show.phtml', $params);
 });
+
 
 $app->get('/users', function ($request, $response) {
     return $response->write('GET /users');
