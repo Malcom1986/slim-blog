@@ -5,6 +5,8 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use DI\Container;
 
+$users = ['mike', 'mishel', 'adel', 'keks', 'kamila'];
+
 $container = new Container();
 $container->set('renderer' ,function () {
 	return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
@@ -31,8 +33,15 @@ $app->get('/users/{id}', function ($request, $response, $args) {
 });
 
 
-$app->get('/users', function ($request, $response) {
-    return $response->write('GET /users');
+$app->get('/users', function ($request, $response) use ($users) {
+    $term = $request->getQueryParam('term', null);
+    $filteredUsers = array_filter($users, fn ($user) => is_numeric(strpos($user, $term)));
+
+    $params = [
+        'term' => $term,
+        'users' => $filteredUsers,
+    ];
+    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 });
 
 
