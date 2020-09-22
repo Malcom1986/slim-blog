@@ -20,6 +20,10 @@ $app->get('/', function ($request, $response) {
     return $response;
 });
 
+$app->get('/users/new', function ($request, $response) {
+	$params = [];
+	return $this->get('renderer')->render($response, 'users/new.phtml', $params);
+});
 
 $app->get('/users/{id}', function ($request, $response, $args) {
 	$id = $args['id'];
@@ -46,9 +50,23 @@ $app->get('/users', function ($request, $response) use ($users) {
 
 
 
+
+
 $app->post('/users', function ($request, $response) {
-    return $response->write('POST /users');
+    $user = $request->getParsedBodyParam('user');
+    $data = json_encode($user);
+    $path = realpath(__DIR__ . '/../repository/users');
+    $res = file_put_contents($path, $data . "\n", FILE_APPEND);
+    var_dump($res);
+    return $response->withRedirect('/users', 302);
 });
+
+
+
+
+
+
+
 
 $app->get('/headers', function ($request, $response) {
 	$headers = json_encode($request->getHeaders(), JSON_PRETTY_PRINT);

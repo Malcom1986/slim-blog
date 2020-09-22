@@ -1,0 +1,32 @@
+<form action="/users" method="post">
+	<div>
+		<label>Name
+			<input type="text" required name="user[name]">
+		</label>
+	</div>
+	<div>
+		<label>Email
+			<input type="email" required name="user[email]">
+		</label>
+	</div>
+	<div>
+		<label>Password
+			<input type="password" name="user[password]">
+		</label>
+	</div>
+	<div>
+		<label>Password confirmation
+			<input type="password" name="user[passwordConfirmation]">			
+		</label>
+	</div>
+	<div>
+		<label>City
+			<select name="user[city]">
+				<option value="3">Moscow</option>
+				<option value="1">Not Moscow</option>
+			</select>
+		</label>
+	</div>
+	<input type="submit" value="Sign Up">
+
+</form>
