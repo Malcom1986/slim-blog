@@ -4,6 +4,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 use DI\Container;
+use App\Validator;
 
 $users = ['mike', 'mishel', 'adel', 'keks', 'kamila'];
 
@@ -21,7 +22,15 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->get('/users/new', function ($request, $response) {
-	$params = [];
+	$params = [
+        'user' => [
+            'name' => '',
+            'email' => '',
+            'password' => '',
+            'passwordConfirmation' => '',
+        ],
+        'errors' => [],
+	];
 	return $this->get('renderer')->render($response, 'users/new.phtml', $params);
 });
 
@@ -48,25 +57,22 @@ $app->get('/users', function ($request, $response) use ($users) {
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 });
 
-
-
-
-
 $app->post('/users', function ($request, $response) {
+	$validator = new Validator();
     $user = $request->getParsedBodyParam('user');
-    $data = json_encode($user);
-    $path = realpath(__DIR__ . '/../repository/users');
-    $res = file_put_contents($path, $data . "\n", FILE_APPEND);
-    var_dump($res);
-    return $response->withRedirect('/users', 302);
+    $errors = $validator->validate($user);
+    if (count($errors) === 0) {
+    	$data = json_encode($user);
+        $path = realpath(__DIR__ . '/../repository/users');
+        $res = file_put_contents($path, $data . "\n", FILE_APPEND);
+        return $response->withRedirect('/users', 302);
+    }
+    $params = [
+    	'user' => $user,
+    	'errors' => $errors,
+    ];
+    return $this->get('renderer')->render($response->withStatus(422), 'users/new.phtml', $params);    
 });
-
-
-
-
-
-
-
 
 $app->get('/headers', function ($request, $response) {
 	$headers = json_encode($request->getHeaders(), JSON_PRETTY_PRINT);

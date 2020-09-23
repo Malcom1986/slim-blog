@@ -1,23 +1,35 @@
 <form action="/users" method="post">
 	<div>
 		<label>Name
-			<input type="text" required name="user[name]">
+			<input type="text"  name="user[name]" value="<?= htmlspecialchars($user['name']) ?>">
 		</label>
+		<?php if (isset($errors['name'])): ?>
+            <div><?= $errors['name'] ?></div>
+        <?php endif ?>
 	</div>
 	<div>
 		<label>Email
-			<input type="email" required name="user[email]">
+			<input type="email"  name="user[email]" value="<?= htmlspecialchars($user['email']) ?>">
 		</label>
+		<?php if (isset($errors['email'])): ?>
+            <div><?= $errors['name'] ?></div>
+        <?php endif ?>
 	</div>
 	<div>
 		<label>Password
-			<input type="password" name="user[password]">
+			<input type="password" name="user[password]" value="<?= htmlspecialchars($user['name']) ?>">
 		</label>
+		<?php if (isset($errors['email'])): ?>
+            <div><?= $errors['name'] ?></div>
+        <?php endif ?>
 	</div>
 	<div>
 		<label>Password confirmation
-			<input type="password" name="user[passwordConfirmation]">			
+			<input type="password" name="user[passwordConfirmation]" value="<?= htmlspecialchars($user['name']) ?>">			
 		</label>
+		<?php if (isset($errors['name'])): ?>
+            <div><?= $errors['name'] ?></div>
+        <?php endif ?>
 	</div>
 	<div>
 		<label>City
