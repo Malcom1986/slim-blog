@@ -15,6 +15,7 @@ $container->set('renderer' ,function () {
 
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
+$router = $app->getRouteCollector()->getRouteParser();
 
 $app->get('/', function ($request, $response) {
     $response->write('Welcome to Slim!');
@@ -43,7 +44,7 @@ $app->get('/users/{id}', function ($request, $response, $args) {
         'name' => $name,
 	];
 	return $this->get('renderer')->render($response, 'users/show.phtml', $params);
-});
+})->setName('user');
 
 
 $app->get('/users', function ($request, $response) use ($users) {
@@ -55,9 +56,9 @@ $app->get('/users', function ($request, $response) use ($users) {
         'users' => $filteredUsers,
     ];
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
-});
+})->setName('users');
 
-$app->post('/users', function ($request, $response) {
+$app->post('/users', function ($request, $response) use ($router) {
 	$validator = new Validator();
     $user = $request->getParsedBodyParam('user');
     $errors = $validator->validate($user);
@@ -65,7 +66,8 @@ $app->post('/users', function ($request, $response) {
     	$data = json_encode($user);
         $path = realpath(__DIR__ . '/../repository/users');
         $res = file_put_contents($path, $data . "\n", FILE_APPEND);
-        return $response->withRedirect('/users', 302);
+        $url = $router->urlFor('users');
+        return $response->withRedirect($url, 302);
     }
     $params = [
     	'user' => $user,
