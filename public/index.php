@@ -7,10 +7,13 @@ use DI\Container;
 use App\Validator;
 
 $users = ['mike', 'mishel', 'adel', 'keks', 'kamila'];
-
+session_start();
 $container = new Container();
 $container->set('renderer' ,function () {
 	return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
+});
+$container->set('flash', function () {
+    return new \Slim\Flash\Messages();
 });
 
 $app = AppFactory::createFromContainer($container);
@@ -50,10 +53,11 @@ $app->get('/users/{id}', function ($request, $response, $args) {
 $app->get('/users', function ($request, $response) use ($users) {
     $term = $request->getQueryParam('term', null);
     $filteredUsers = array_filter($users, fn ($user) => is_numeric(strpos($user, $term)));
-
+    $flash = $this->get('flash')->getMessages();
     $params = [
         'term' => $term,
         'users' => $filteredUsers,
+        'flash' => $flash,
     ];
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 })->setName('users');
@@ -67,6 +71,7 @@ $app->post('/users', function ($request, $response) use ($router) {
         $path = realpath(__DIR__ . '/../repository/users');
         $res = file_put_contents($path, $data . "\n", FILE_APPEND);
         $url = $router->urlFor('users');
+        $this->get('flash')->addMessage('succes', 'User has been created!');
         return $response->withRedirect($url, 302);
     }
     $params = [
