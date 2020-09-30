@@ -6,7 +6,7 @@ class Repository
 {
     private const PATH = __DIR__ . '/../repository/users';
 
-    public function add($data)
+    public function add(array $data)
     {
         $id = uniqid();
         $data['id'] = $id;
