@@ -43,7 +43,6 @@ $app->get('/users/{id}', function ($request, $response, $args) {
     $repo = new Repository();
     $id = $args['id'];
     $user = $repo->get($id);
-    print_r($user);
     $params = [
         'user' => $user,
     ];
