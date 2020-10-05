@@ -25,7 +25,7 @@ class Repository
     public function get($id)
     {
         $allData = $this->all();
-        $data = array_filter($allData, fn ($item) => $item->id === $id);
+        $data = collect($allData)->firstWhere('id', $id);
         return $data;
     }
 }

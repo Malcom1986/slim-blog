@@ -40,24 +40,27 @@ $app->get('/users/new', function ($request, $response) {
 });
 
 $app->get('/users/{id}', function ($request, $response, $args) {
+    $repo = new Repository();
     $id = $args['id'];
-    $name = $request->getQueryParam('name', 'noname');
+    $user = $repo->get($id);
+    print_r($user);
     $params = [
-        'id' => $id,
-        'nickname' => "user - {$id}",
-        'name' => $name,
+        'user' => $user,
     ];
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
 })->setName('user');
 
 
-$app->get('/users', function ($request, $response) use ($users) {
+$app->get('/users', function ($request, $response) {
+    $repo = new Repository();
     $term = $request->getQueryParam('term', null);
-    $filteredUsers = array_filter($users, fn ($user) => is_numeric(strpos($user, $term)));
+    $allUsers = $repo->all();
+    $filteredUsers = array_filter($allUsers, fn ($user) => is_numeric(strpos($user->name, $term)));
+    $users = $term ? $filteredUsers : $allUsers;
     $flash = $this->get('flash')->getMessages();
     $params = [
         'term' => $term,
-        'users' => $filteredUsers,
+        'users' => $users,
         'flash' => $flash,
     ];
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
