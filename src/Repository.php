@@ -1,6 +1,7 @@
 <?php
-
 namespace App;
+require __DIR__ . '/../vendor/autoload.php';
+
 
 class Repository
 {
@@ -10,7 +11,7 @@ class Repository
     {
         $id = uniqid();
         $data['id'] = $id;
-        $encodedData = json_encode($data) . "\n";
+        $encodedData = "\n" . json_encode($data);
         file_put_contents(self::PATH, $encodedData, FILE_APPEND);
     }
 
@@ -27,5 +28,16 @@ class Repository
         $allData = $this->all();
         $data = collect($allData)->firstWhere('id', $id);
         return $data;
+    }
+
+    public function save($data)
+    {
+        $id = $data['id'];
+        $allData = $this->all();
+        $currentData = $this->get($id);
+        $indexOfData = array_search($currentData, $allData);
+        $allData[$indexOfData] = $data;
+        $json = array_map(fn ($item) => json_encode($item), $allData);
+        file_put_contents(self::PATH, implode("\n", $json));
     }
 }
