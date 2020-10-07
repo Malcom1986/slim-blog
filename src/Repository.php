@@ -1,7 +1,6 @@
 <?php
-namespace App;
-require __DIR__ . '/../vendor/autoload.php';
 
+namespace App;
 
 class Repository
 {
@@ -32,7 +31,7 @@ class Repository
 
     public function save($data)
     {
-        $id = $data['id'];
+        $id = $data->id;
         $allData = $this->all();
         $currentData = $this->get($id);
         $indexOfData = array_search($currentData, $allData);
