@@ -9,7 +9,8 @@ class Validator
         $errors = [];
         foreach ($user as $key => $value) {
             if (empty($user[$key])) {
-                $errors[$key] = 'Can not be blank';
+                $fieldName = ucfirst($key);
+                $errors[$key] = "{$fieldName} cant be blank";
             }
         }
         if ($user['password'] !== $user['passwordConfirmation']) {
