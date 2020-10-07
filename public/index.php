@@ -6,6 +6,7 @@ use Slim\Factory\AppFactory;
 use DI\Container;
 use App\Validator;
 use App\Repository;
+use Slim\Middleware\MethodOverrideMiddleware;
 
 $users = ['mike', 'mishel', 'adel', 'keks', 'kamila'];
 session_start();
@@ -19,6 +20,7 @@ $container->set('flash', function () {
 
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
+$app->add(MethodOverrideMiddleware::class);
 $router = $app->getRouteCollector()->getRouteParser();
 
 $app->get('/', function ($request, $response) {
@@ -48,6 +50,17 @@ $app->get('/users/{id}', function ($request, $response, $args) {
     ];
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
 })->setName('user');
+
+$app->get('/users/{id}/edit', function ($request, $response, $args) {
+    $repo = new Repository();
+    $id = $args['id'];
+    $user = $repo->get($id);
+    $params = [
+        'user' => $user,
+        'errors' => [],
+    ];
+    return $this->get('renderer')->render($response, 'users/edit.phtml', $params);
+})->setName('editUser');
 
 
 $app->get('/users', function ($request, $response) {
@@ -83,8 +96,26 @@ $app->post('/users', function ($request, $response) use ($router) {
     return $this->get('renderer')->render($response->withStatus(422), 'users/new.phtml', $params);
 });
 
-// $app->patch()
-
-
+$app->patch('/users/{id}', function ($request, $response, $args) use ($router) {
+    $id = $args['id'];
+    $repo = new Repository();
+    $user = $repo->get($id);
+    $data = $request->getParsedBodyParam('user');
+    print_r($data);
+    $validator = new Validator();
+    $errors = $validator->validate($data);
+    if (count($errors) === 0) {
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $repo->save($user);
+        $url = $router->urlFor('editUser', ['id' => $user->id]);
+        return $response->withRedirect($url);
+    }
+    $params = [
+        'user' => $user,
+        'errors' => $errors,
+    ];
+    return $this->get('renderer')->render($response->withStatus(422), 'users/edit.phtml', $params);
+});
 
 $app->run();
